@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface TarjetaService {
     Optional<Tarjeta> findByNumero(String numero);
     boolean activar(String numero);
+
+    boolean cambiarPin(String numero, String nuevoPin);
 }

@@ -16,6 +16,6 @@ public class Movimiento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String tipo;
-    private DecimalFormat cantidad;
+    private Long cantidad;
     private Date fecha;
 }

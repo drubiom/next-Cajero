@@ -1,5 +1,6 @@
 package com.next.cajero.controller;
 
+import com.next.cajero.service.CuentaService;
 import com.next.cajero.service.TarjetaService;
 import com.next.cajero.validate.ValidadorTarjeta;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.DecimalFormat;
+
 @RestController
 public class CajeroController {
     @Autowired
@@ -17,6 +20,7 @@ public class CajeroController {
 
     @Autowired
     TarjetaService tarjetaService;
+
     @GetMapping(value = "movimientos")
     public ResponseEntity getMovimientos(
             @RequestParam(value = "numTarjeta") String numTarjeta,
@@ -53,5 +57,29 @@ public class CajeroController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GetMapping(value = "cambiarPin")
+    public ResponseEntity cambiarPin(
+            @RequestParam(value = "numTarjeta") String numTarjeta,
+            @RequestParam(value = "pin") String pin,
+            @RequestParam(value = "nuevoPin") String nuevoPin) {
+        try{
+            //Tarjeta activada?
+            if(validadorTarjeta.activa(numTarjeta)){
+                if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
+                    tarjetaService.cambiarPin(numTarjeta, nuevoPin);
+                    return new ResponseEntity("Pin cambiado", HttpStatus.OK);
+                }else{
+                    return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
+                }
+            }else{
+                return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     }
 }

@@ -12,7 +12,7 @@ public class Tarjeta {
     private String numero;
     private String tipo;
     private String pin;
-    private double limite;
+    private Long limite;
     private boolean activa;
     @ManyToOne
     private Cuenta cuenta;

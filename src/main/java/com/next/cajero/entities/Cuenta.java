@@ -13,7 +13,7 @@ public class Cuenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String iban;
-    private DecimalFormat saldo;
+    private Long saldo;
     @ManyToOne
     private Banco banco;
     @ManyToMany(mappedBy = "cuentas")
