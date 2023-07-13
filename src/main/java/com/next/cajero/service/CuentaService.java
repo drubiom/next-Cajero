@@ -11,4 +11,6 @@ public interface CuentaService {
     boolean ingresarDinero(String numTarjeta, Long cantidad);
 
     List<Movimiento> solicitaMovimientos(String numTarjeta);
+
+    boolean transferencia(String numTarjeta, String iban, Long cantidad);
 }

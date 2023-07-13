@@ -154,4 +154,30 @@ public class CajeroController {
             throw new RuntimeException(e);
         }
     }
+
+    @GetMapping(value = "transferencia")
+    public ResponseEntity ingresarDinero(
+            @RequestParam(value = "numTarjeta") String numTarjeta,
+            @RequestParam(value = "pin") String pin,
+            @RequestParam(value = "cantidad") Long cantidad,
+            @RequestParam(value = "ibanDestino") String iban) {
+        try{
+            //Tarjeta activada?
+            if(validadorTarjeta.activa(numTarjeta)){
+                if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
+                    if(cuentaService.transferencia(numTarjeta ,iban, cantidad)){
+                        return new ResponseEntity("Transferencia realizada", HttpStatus.OK);
+                    }else{
+                        return new ResponseEntity("Error al realizar transferencia", HttpStatus.OK);
+                    }
+                }else{
+                    return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
+                }
+            }else{
+                return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

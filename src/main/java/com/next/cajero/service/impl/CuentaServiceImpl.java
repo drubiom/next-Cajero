@@ -111,4 +111,40 @@ public class CuentaServiceImpl implements CuentaService {
         }
         return null;
     }
+
+    @Override
+    public boolean transferencia(String numTarjeta, String iban, Long cantidad) {
+        Optional<Tarjeta> tarjeta = tarjetaRepository.findByNumero(numTarjeta);
+        if (tarjeta.isPresent()) {
+            Tarjeta recuperada = tarjeta.get();
+            Cuenta cuenta = recuperada.getCuenta();
+            //TODO Validar IBAN
+            if(cuenta.getBanco().getComision() != 0){
+                //Tiene comision
+                Long comision = cantidad*cuenta.getBanco().getComision();
+                Long cantidadTotal = cantidad+comision;
+                cuenta.setSaldo(cuenta.getSaldo()-cantidadTotal);
+                Movimiento mov = new Movimiento();
+                mov.setTipo("Comisión");
+                mov.setFecha(new Date());
+                mov.setCantidad(comision);
+                mov.setCuenta(cuenta);
+                movimientoRepository.save(mov);
+
+            }else{
+                //No tiene comision
+                cuenta.setSaldo(cuenta.getSaldo()-cantidad);
+            }
+            //TODO ingresar en la cuenta de destino el dinero
+            Movimiento mov = new Movimiento();
+            mov.setTipo("Transferencia");
+            mov.setFecha(new Date());
+            mov.setCantidad(cantidad);
+            mov.setCuenta(cuenta);
+            movimientoRepository.save(mov);
+            cuentaRepository.save(cuenta);
+            return true;
+        }
+        return false;
+    }
 }
