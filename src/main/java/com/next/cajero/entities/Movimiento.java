@@ -1,9 +1,6 @@
 package com.next.cajero.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.text.DecimalFormat;
@@ -18,4 +15,6 @@ public class Movimiento {
     private String tipo;
     private Long cantidad;
     private Date fecha;
+    @ManyToOne
+    private Cuenta cuenta;
 }

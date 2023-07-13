@@ -1,5 +1,7 @@
 package com.next.cajero.controller;
 
+import com.next.cajero.DAO.MovimientoDAO;
+import com.next.cajero.entities.Movimiento;
 import com.next.cajero.service.CuentaService;
 import com.next.cajero.service.TarjetaService;
 import com.next.cajero.validate.ValidadorTarjeta;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class CajeroController {
@@ -29,15 +33,26 @@ public class CajeroController {
             @RequestParam(value = "pin") String pin) {
         try{
             //Tarjeta activada?
-            if(!validadorTarjeta.activa(numTarjeta)){
+            if(validadorTarjeta.activa(numTarjeta)){
+                //Pin correcto?
+                if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
+                    List<Movimiento> movimientos = cuentaService.solicitaMovimientos(numTarjeta);
+                    List <MovimientoDAO> result = new ArrayList<>();
+                    for (Movimiento movimiento : movimientos) {
+                        result.add(new MovimientoDAO(movimiento));
+                    }
+                    if (!result.isEmpty())
+                        return new ResponseEntity(result, HttpStatus.OK);
+                }else{
+                    return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
+                }
+            }else{
                 return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
             }
-            //Pin correcto?
-
-            return new ResponseEntity("", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
     }
 
     @GetMapping(value = "activar")

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -52,6 +53,7 @@ public class CuentaServiceImpl implements CuentaService {
                 mov.setTipo("Comisión");
                 mov.setFecha(new Date());
                 mov.setCantidad(comision);
+                mov.setCuenta(cuenta);
                 movimientoRepository.save(mov);
 
             }else{
@@ -62,6 +64,7 @@ public class CuentaServiceImpl implements CuentaService {
             mov.setTipo("Retirada");
             mov.setFecha(new Date());
             mov.setCantidad(cantidad);
+            mov.setCuenta(cuenta);
             movimientoRepository.save(mov);
             cuentaRepository.save(cuenta);
             return true;
@@ -86,10 +89,26 @@ public class CuentaServiceImpl implements CuentaService {
             mov.setTipo("Ingreso");
             mov.setFecha(new Date());
             mov.setCantidad(cantidad);
+            mov.setCuenta(cuenta);
             movimientoRepository.save(mov);
             cuentaRepository.save(cuenta);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Movimiento> solicitaMovimientos(String numTarjeta) {
+        Optional<Tarjeta> tarjeta = tarjetaRepository.findByNumero(numTarjeta);
+        if (tarjeta.isPresent()) {
+            Tarjeta recuperada = tarjeta.get();
+            Cuenta cuenta = recuperada.getCuenta();
+            Optional<List<Movimiento>> movimientos = movimientoRepository.findByCuenta(cuenta);
+            if (movimientos.isPresent()) {
+                List<Movimiento> result = movimientos.get();
+                return result;
+            }
+        }
+        return null;
     }
 }
