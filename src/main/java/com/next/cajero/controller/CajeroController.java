@@ -21,6 +21,8 @@ public class CajeroController {
     @Autowired
     TarjetaService tarjetaService;
 
+    @Autowired
+    CuentaService cuentaService;
     @GetMapping(value = "movimientos")
     public ResponseEntity getMovimientos(
             @RequestParam(value = "numTarjeta") String numTarjeta,
@@ -81,5 +83,25 @@ public class CajeroController {
         }
     }
 
+    @GetMapping(value = "sacarDinero")
+    public ResponseEntity sacarDinero(
+            @RequestParam(value = "numTarjeta") String numTarjeta,
+            @RequestParam(value = "pin") String pin,
+            @RequestParam(value = "cantidad") Long cantidad) {
+        try{
+            //Tarjeta activada?
+            if(validadorTarjeta.activa(numTarjeta)){
+                if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
+                    cuentaService.sacarDinero(numTarjeta ,cantidad);
+                    return new ResponseEntity("Pin cambiado", HttpStatus.OK);
+                }else{
+                    return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
+                }
+            }else{
+                return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
