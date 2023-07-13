@@ -48,8 +48,11 @@ public class CajeroController {
             //Tarjeta activada?
             if(!validadorTarjeta.activa(numTarjeta)){
                 if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
-                    tarjetaService.activar(numTarjeta);
-                    return new ResponseEntity("Tarjeta activada", HttpStatus.OK);
+                    if(tarjetaService.activar(numTarjeta)) {
+                        return new ResponseEntity("Tarjeta activada", HttpStatus.OK);
+                    }else {
+                        return new ResponseEntity("Error al activar tarjeta", HttpStatus.OK);
+                    }
                 }else{
                     return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
                 }
@@ -70,8 +73,12 @@ public class CajeroController {
             //Tarjeta activada?
             if(validadorTarjeta.activa(numTarjeta)){
                 if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
-                    tarjetaService.cambiarPin(numTarjeta, nuevoPin);
-                    return new ResponseEntity("Pin cambiado", HttpStatus.OK);
+                    if(tarjetaService.cambiarPin(numTarjeta, nuevoPin)){
+                        return new ResponseEntity("Pin cambiado", HttpStatus.OK);
+                    }else{
+                        return new ResponseEntity("Error al cambiar pin", HttpStatus.OK);
+                    }
+
                 }else{
                     return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
                 }
@@ -92,8 +99,36 @@ public class CajeroController {
             //Tarjeta activada?
             if(validadorTarjeta.activa(numTarjeta)){
                 if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
-                    cuentaService.sacarDinero(numTarjeta ,cantidad);
-                    return new ResponseEntity("Pin cambiado", HttpStatus.OK);
+                    if(cuentaService.sacarDinero(numTarjeta ,cantidad)){
+                        return new ResponseEntity("Dinero Retirado", HttpStatus.OK);
+                    }else{
+                        return new ResponseEntity("Error al retirar dinero", HttpStatus.OK);
+                    }
+                }else{
+                    return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
+                }
+            }else{
+                return new ResponseEntity("Tarjeta no activada", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping(value = "ingresarDinero")
+    public ResponseEntity ingresarDinero(
+            @RequestParam(value = "numTarjeta") String numTarjeta,
+            @RequestParam(value = "pin") String pin,
+            @RequestParam(value = "cantidad") Long cantidad) {
+        try{
+            //Tarjeta activada?
+            if(validadorTarjeta.activa(numTarjeta)){
+                if(validadorTarjeta.pinCorrecto(numTarjeta, pin)) {
+                    if(cuentaService.ingresarDinero(numTarjeta ,cantidad)){
+                        return new ResponseEntity("Dinero Ingresado", HttpStatus.OK);
+                    }else{
+                        return new ResponseEntity("Error al ingresar dinero", HttpStatus.OK);
+                    }
                 }else{
                     return new ResponseEntity("Pin incorrecto", HttpStatus.OK);
                 }
