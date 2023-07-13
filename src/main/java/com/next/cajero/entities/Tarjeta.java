@@ -9,7 +9,7 @@ public class Tarjeta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long numero;
+    private String numero;
     private String tipo;
     private String pin;
     private double limite;
